@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Professional Shot List Maker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Plan, organize, filter, and export production-ready film shot lists by scene, location, and camera movement.">
+    <meta name="theme-color" content="#131314">
+    <meta name="color-scheme" content="light dark">
+    <title>Shotlist Maker | Production Shot Lists</title>
     
     <!-- External Libraries -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -225,13 +228,16 @@
 
         .search-filter {
             display: flex;
-            gap: 1rem;
+            align-items: center;
+            gap: 0.65rem;
             flex: 1;
             min-width: 300px;
+            flex-wrap: wrap;
         }
 
         .search-box {
             flex: 1;
+            min-width: 180px;
             padding: 0.5rem 1rem;
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
@@ -253,7 +259,58 @@
             cursor: pointer;
             font-family: inherit;
             outline: none;
+            min-height: 40px;
         }
+
+        #filter-select { min-width: 132px; }
+        #location-filter { min-width: 155px; max-width: 220px; }
+
+        .movement-filters {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.65rem;
+            min-height: 40px;
+            padding: 0.25rem 0.65rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface-hover);
+            white-space: nowrap;
+        }
+
+        .movement-filter-heading {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .movement-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: var(--text-main);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .movement-toggle .switch { width: 38px; height: 22px; flex: 0 0 auto; }
+        .movement-toggle .slider:before { width: 14px; height: 14px; }
+        .movement-toggle .switch input:checked + .slider:before { transform: translateX(16px); }
+        .movement-toggle .switch input:focus-visible + .slider {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .shot-movement-select {
+            min-height: 40px;
+            cursor: pointer;
+        }
+
+        [data-theme="dark"] .shot-movement-select { color-scheme: dark; }
 
         .scene-container {
             background: var(--surface);
@@ -335,7 +392,7 @@
         /* Table Header for Shots */
         .shots-header {
             display: grid;
-            grid-template-columns: 40px 60px 180px 1fr 60px 120px;
+            grid-template-columns: 40px 60px minmax(130px, 1.1fr) minmax(115px, 0.8fr) minmax(220px, 2fr) 55px 120px;
             gap: 1rem;
             padding: 0.75rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
@@ -349,7 +406,7 @@
 
         .shot-row {
             display: grid;
-            grid-template-columns: 40px 60px 180px 1fr 60px 120px;
+            grid-template-columns: 40px 60px minmax(130px, 1.1fr) minmax(115px, 0.8fr) minmax(220px, 2fr) 55px 120px;
             gap: 1rem;
             padding: 1rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
@@ -744,6 +801,17 @@
             display: none;
         }
 
+        @media (min-width: 769px) and (max-width: 1000px) {
+            .shots-header,
+            .shot-row {
+                grid-template-columns: 32px 48px minmax(110px, 1fr) minmax(100px, 0.8fr) minmax(170px, 1.6fr) 46px 100px;
+                gap: 0.55rem;
+            }
+            .shots-header { padding-left: 1rem; padding-right: 1rem; }
+            .shot-row { padding-left: 1rem; padding-right: 1rem; }
+            .shot-actions .btn-icon { padding: 0.4rem; }
+        }
+
         @media (max-width: 768px) {
             /* === BODY === */
             body {
@@ -786,20 +854,33 @@
                 border-radius: var(--radius-sm);
             }
             .search-filter {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
                 min-width: 0;
                 width: 100%;
-                flex-direction: row;
                 gap: 0.5rem;
             }
             .search-box {
+                grid-column: 1 / -1;
+                min-width: 0;
+                width: 100%;
                 font-size: 14px;
                 padding: 10px 12px;
             }
             .filter-select {
+                width: 100%;
+                min-width: 0;
+                max-width: none;
                 font-size: 13px;
                 padding: 10px 8px;
-                min-width: 90px;
             }
+            #filter-select, #location-filter { min-width: 0; }
+            .movement-filters {
+                grid-column: 1 / -1;
+                justify-content: space-between;
+                padding: 0.35rem 0.6rem;
+            }
+            .movement-filter-heading { font-size: 0.68rem; }
             /* Hide desktop toolbar buttons */
             .toolbar > div:last-child {
                 display: none;
@@ -1174,7 +1255,7 @@
         
         <div class="controls">
             <!-- Hidden inputs -->
-            <input type="file" id="import-json-input" accept=".json" style="display: none;" onchange="importProjectJSON(event)">
+            <input type="file" id="import-json-input" accept=".json,.slp,application/json" style="display: none;" onchange="importProjectJSON(event)">
             
             <span id="sync-status" style="font-size: 0.75rem; color: var(--text-muted); display: none;">Saving...</span>
             
@@ -1246,13 +1327,27 @@
 
     <main class="container">
         <div class="toolbar">
-            <div class="search-filter">
-                <input type="text" id="search-input" class="search-box" placeholder="Search scenes, shots, types..." onkeyup="handleSearch()">
-                <select id="filter-select" class="filter-select" onchange="handleSearch()">
-                    <option value="All">All Shots</option>
+            <div class="search-filter" role="search" aria-label="Search and filter shot list">
+                <input type="search" id="search-input" class="search-box" placeholder="Search scenes, shots, types..." aria-label="Search scenes and shots" oninput="handleSearch()">
+                <select id="filter-select" class="filter-select" aria-label="Filter by completion" onchange="handleSearch()">
+                    <option value="All">All shots</option>
                     <option value="Done">Completed</option>
                     <option value="NotDone">Pending</option>
                 </select>
+                <select id="location-filter" class="filter-select" aria-label="Filter by location" onchange="handleSearch()">
+                    <option value="">All locations</option>
+                </select>
+                <div class="movement-filters" role="group" aria-label="Filter by shot movement" title="Turn on Still and/or Moving to filter. Turn both off to show all shot movements.">
+                    <span class="movement-filter-heading">Movement</span>
+                    <label class="movement-toggle">
+                        <span>Still</span>
+                        <span class="switch"><input type="checkbox" id="filter-still" aria-label="Show still shots" onchange="handleSearch()"><span class="slider"></span></span>
+                    </label>
+                    <label class="movement-toggle">
+                        <span>Moving</span>
+                        <span class="switch"><input type="checkbox" id="filter-moving" aria-label="Show moving shots" onchange="handleSearch()"><span class="slider"></span></span>
+                    </label>
+                </div>
             </div>
             <div style="display: flex; gap: 0.5rem;">
                 <button class="btn" id="btn-sort-scenes" onclick="sortScenesByLocation()" title="Sort scenes by location name">
@@ -1268,6 +1363,12 @@
 
         <div id="scenes-container">
             <!-- Scenes injected via JS -->
+        </div>
+
+        <div id="no-results" class="empty-state" style="display: none;">
+            <h2>No shots match these filters</h2>
+            <p style="margin-top: 0.5rem; margin-bottom: 1.5rem;">Try changing your search or filter selections.</p>
+            <button class="btn" onclick="clearFilters()">Clear filters</button>
         </div>
         
         <div id="empty-state" class="empty-state" style="display: none;">
@@ -1466,7 +1567,7 @@
                     <div style="padding:12px 14px; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); border-bottom:1px solid var(--border-color);">Locations</div>
                     <div id="pdf-location-list"></div>
                 </div>
-                <iframe id="pdf-preview-iframe" style="flex:1; border:none; background:#525659; width:100%;"></iframe>
+                <iframe id="pdf-preview-iframe" title="Shot list PDF preview" style="flex:1; border:none; background:#525659; width:100%;"></iframe>
             </div>
             <div class="modal-footer" style="justify-content: space-between;">
                 <button class="btn" onclick="closePDFPreview()">Close</button>
@@ -1523,6 +1624,8 @@
             ui: {
                 searchQuery: "",
                 filter: "All",
+                locationFilter: "",
+                movementFilters: [],
                 activeDropdown: null,
                 isDirty: false, // True if unsaved changes exist
                 isSorted: false,
@@ -1622,7 +1725,7 @@
                         migrateStoryboardFormat(data);
                     } else {
                         state.project = data.project || state.project;
-                        state.scenes = data.scenes || [];
+                        state.scenes = normalizeShotListScenes(data.scenes || []);
                         state.google.fileId = data.fileId || null;
                     }
                 } catch(e) { console.error("Project load error"); }
@@ -1648,17 +1751,70 @@
 
         // --- SCENE & SHOT MANAGEMENT ---
         
+        function normalizeShotMovement(movement) {
+            const normalized = String(movement || "").trim().toLowerCase();
+            if (normalized === "still") return "Still";
+            if (normalized === "moving") return "Moving";
+            return "";
+        }
+
+        function normalizeShotListScenes(scenes) {
+            if (!Array.isArray(scenes)) return [];
+            return scenes.map((sourceScene, sceneIndex) => {
+                const scene = sourceScene && typeof sourceScene === "object" ? sourceScene : {};
+                const parsedNumber = Number(scene.number);
+                const sceneNumber = Number.isFinite(parsedNumber) && parsedNumber > 0 ? parsedNumber : sceneIndex + 1;
+                const shots = Array.isArray(scene.shots) ? scene.shots : [];
+
+                return {
+                    ...scene,
+                    id: scene.id || generateId(),
+                    number: sceneNumber,
+                    title: typeof scene.title === "string" ? scene.title : "",
+                    location: typeof scene.location === "string" ? scene.location : "",
+                    time: typeof scene.time === "string" ? scene.time : "",
+                    shots: shots.map((sourceShot, shotIndex) => {
+                        const shot = sourceShot && typeof sourceShot === "object" ? sourceShot : {};
+                        return {
+                            ...shot,
+                            id: shot.id || generateId(),
+                            shotNumber: shot.shotNumber == null ? `${sceneNumber}.${shotIndex + 1}` : String(shot.shotNumber),
+                            type: typeof shot.type === "string" ? shot.type : String(shot.type || ""),
+                            movement: normalizeShotMovement(shot.movement),
+                            description: typeof shot.description === "string" ? shot.description : String(shot.description || ""),
+                            done: Boolean(shot.done)
+                        };
+                    })
+                };
+            });
+        }
+
         function createShotTemplate(sceneNumber, index) {
             return {
                 id: generateId(),
                 shotNumber: state.settings.autoShotNumbering ? `${sceneNumber}.${index + 1}` : "",
                 type: "",
+                movement: "",
                 description: "",
                 done: false
             };
         }
 
+        function clearFiltersForCreation() {
+            const hasActiveFilters = Boolean(
+                state.ui.searchQuery ||
+                state.ui.locationFilter ||
+                state.ui.filter !== 'All' ||
+                state.ui.movementFilters.length
+            );
+            if (!hasActiveFilters) return;
+
+            clearFilters();
+            addNotification('Filters cleared so the new item stays visible while you edit it.', 'info');
+        }
+
         function addScene(afterSceneId = null, focus = false) {
+            clearFiltersForCreation();
             isUIBuilding = true;
             let nextNum = state.scenes.length + 1;
             if (state.ui.isSorted) {
@@ -1813,8 +1969,8 @@
                 state.ui.originalSceneOrder = state.scenes.map(s => s.id);
                 
                 state.scenes.sort((a, b) => {
-                    const locA = extractLocationFromTitle(a.title);
-                    const locB = extractLocationFromTitle(b.title);
+                    const locA = String(a.location || '').trim() || extractLocationFromTitle(a.title);
+                    const locB = String(b.location || '').trim() || extractLocationFromTitle(b.title);
                     return locA.localeCompare(locB);
                 });
                 
@@ -1838,6 +1994,7 @@
         }
 
         function addShot(sceneId) {
+            clearFiltersForCreation();
             const scene = state.scenes.find(s => s.id === sceneId);
             if (scene) {
                 scene.shots.push(createShotTemplate(scene.number, scene.shots.length));
@@ -1939,46 +2096,86 @@
         }
 
         // --- RENDERING ---
-        function renderScenes() {
-            const container = document.getElementById('scenes-container');
-            const emptyState = document.getElementById('empty-state');
-            
-            if (state.scenes.length === 0) {
-                container.innerHTML = '';
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            container.innerHTML = '';
+        function refreshLocationFilterOptions() {
+            const select = document.getElementById('location-filter');
+            if (!select) return;
 
-            const q = state.ui.searchQuery.toLowerCase();
-            const f = state.ui.filter;
+            const selectedLocation = state.ui.locationFilter || '';
+            const locationByKey = new Map();
+            state.scenes.forEach(scene => {
+                const location = String(scene.location || '').trim();
+                if (location && !locationByKey.has(location.toLocaleLowerCase())) {
+                    locationByKey.set(location.toLocaleLowerCase(), location);
+                }
+            });
 
-            state.scenes.forEach((scene, sceneIndex) => {
-                // Filter shots
-                let visibleShots = scene.shots;
-                
-                if (f === "Done") visibleShots = visibleShots.filter(s => s.done);
-                if (f === "NotDone") visibleShots = visibleShots.filter(s => !s.done);
-                
-                let sceneMatch = true;
-                if (q) {
-                    sceneMatch = (scene.title||"").toLowerCase().includes(q) || 
-                                 (scene.location||"").toLowerCase().includes(q);
-                    
-                    if (!sceneMatch) {
-                        visibleShots = visibleShots.filter(s => 
-                            (s.type||"").toLowerCase().includes(q) || 
-                            (s.description||"").toLowerCase().includes(q) ||
-                            (s.shotNumber||"").toLowerCase().includes(q)
-                        );
+            const locations = Array.from(locationByKey.values()).sort((a, b) => a.localeCompare(b));
+            select.innerHTML = '<option value="">All locations</option>' + locations.map(location =>
+                `<option value="${escapeHTML(location)}">${escapeHTML(location)}</option>`
+            ).join('');
+
+            const matchingLocation = locations.find(location =>
+                location.toLocaleLowerCase() === selectedLocation.toLocaleLowerCase()
+            );
+            state.ui.locationFilter = matchingLocation || '';
+            select.value = state.ui.locationFilter;
+        }
+
+        function getFilteredScenes() {
+            const query = String(state.ui.searchQuery || '').trim().toLocaleLowerCase();
+            const locationFilter = String(state.ui.locationFilter || '').trim().toLocaleLowerCase();
+            const movementFilters = new Set((state.ui.movementFilters || []).map(normalizeShotMovement).filter(Boolean));
+
+            return state.scenes.map(scene => {
+                const sceneLocation = String(scene.location || '').trim();
+                if (locationFilter && sceneLocation.toLocaleLowerCase() !== locationFilter) return null;
+
+                let visibleShots = Array.isArray(scene.shots) ? scene.shots : [];
+                if (state.ui.filter === 'Done') visibleShots = visibleShots.filter(shot => shot.done);
+                if (state.ui.filter === 'NotDone') visibleShots = visibleShots.filter(shot => !shot.done);
+                if (movementFilters.size > 0) {
+                    visibleShots = visibleShots.filter(shot => movementFilters.has(normalizeShotMovement(shot.movement)));
+                }
+
+                if (query) {
+                    const sceneMatchesQuery = [scene.title, scene.location, scene.time].some(value =>
+                        String(value || '').toLocaleLowerCase().includes(query)
+                    );
+                    if (!sceneMatchesQuery) {
+                        visibleShots = visibleShots.filter(shot => [
+                            shot.type,
+                            shot.movement,
+                            shot.description,
+                            shot.shotNumber
+                        ].some(value => String(value || '').toLocaleLowerCase().includes(query)));
                     }
                 }
 
-                // If filtering hides everything, skip scene
-                if (!sceneMatch && visibleShots.length === 0) return;
+                return visibleShots.length > 0 ? { ...scene, shots: visibleShots } : null;
+            }).filter(Boolean);
+        }
 
+        function renderScenes() {
+            const container = document.getElementById('scenes-container');
+            const emptyState = document.getElementById('empty-state');
+            const noResults = document.getElementById('no-results');
+            container.innerHTML = '';
+            noResults.style.display = 'none';
+            refreshLocationFilterOptions();
+
+            if (state.scenes.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            const filteredScenes = getFilteredScenes();
+            if (filteredScenes.length === 0) {
+                noResults.style.display = 'block';
+                return;
+            }
+
+            filteredScenes.forEach(scene => {
                 const sceneEl = document.createElement('div');
                 sceneEl.className = 'scene-container';
                 sceneEl.dataset.id = scene.id;
@@ -1990,30 +2187,31 @@
                             <div class="scene-inputs">
                                 <input type="text" class="scene-title scene-title-input" value="${escapeHTML(scene.title)}" placeholder="Scene Title (e.g. INT. APARTMENT)" oninput="updateSceneField('${scene.id}', 'title', this.value)" onkeydown="handleSceneNavigation(event, 'location')">
                                 <div style="display:flex; gap:0.5rem; width:100%;">
-                                    <input type="text" class="scene-meta scene-loc-input" style="flex:2;" value="${escapeHTML(scene.location)}" placeholder="Location Details" oninput="updateSceneField('${scene.id}', 'location', this.value)" onkeydown="handleSceneNavigation(event, 'time')">
+                                    <input type="text" class="scene-meta scene-loc-input" style="flex:2;" value="${escapeHTML(scene.location)}" placeholder="Location Details" oninput="updateSceneField('${scene.id}', 'location', this.value)" onchange="refreshLocationFilterOptions(); handleSearch()" onkeydown="handleSceneNavigation(event, 'time')">
                                     <input type="text" class="scene-meta scene-time-input" style="flex:1;" value="${escapeHTML(scene.time)}" placeholder="Day/Night" oninput="updateSceneField('${scene.id}', 'time', this.value)" onkeydown="handleSceneNavigation(event, 'shot')">
                                 </div>
                             </div>
                         </div>
                         <div class="scene-actions">
-                            <button class="btn-icon" onclick="moveScene('${scene.id}', -1)" title="Move Up">↑</button>
-                            <button class="btn-icon" onclick="moveScene('${scene.id}', 1)" title="Move Down">↓</button>
-                            <button class="btn-icon" onclick="duplicateScene('${scene.id}')" title="Duplicate Scene">⎘</button>
-                            <button class="btn-icon" style="color: var(--danger-color);" onclick="requestDeleteScene('${scene.id}')" title="Delete Scene">🗑</button>
+                            <button class="btn-icon" onclick="moveScene('${scene.id}', -1)" title="Move Up" aria-label="Move scene up">↑</button>
+                            <button class="btn-icon" onclick="moveScene('${scene.id}', 1)" title="Move Down" aria-label="Move scene down">↓</button>
+                            <button class="btn-icon" onclick="duplicateScene('${scene.id}')" title="Duplicate Scene" aria-label="Duplicate scene">⎘</button>
+                            <button class="btn-icon" style="color: var(--danger-color);" onclick="requestDeleteScene('${scene.id}')" title="Delete Scene" aria-label="Delete scene">🗑</button>
                         </div>
                     </div>
-                    
+
                     <div class="shots-header">
                         <div></div>
                         <div>Shot #</div>
-                        <div>Type</div>
+                        <div>Framing / Type</div>
+                        <div>Movement</div>
                         <div>Action / Description</div>
                         <div style="text-align:center;">Done</div>
                         <div></div>
                     </div>
-                    
+
                     <div class="shots-container" id="shots-${scene.id}"></div>
-                    
+
                     <button class="add-shot-btn" onclick="addShot('${scene.id}')">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         Add Shot
@@ -2021,29 +2219,29 @@
                 `;
 
                 container.appendChild(sceneEl);
-
-                // Render Shots
                 const shotsContainer = sceneEl.querySelector(`#shots-${scene.id}`);
-                visibleShots.forEach((shot, shotIndex) => {
+
+                scene.shots.forEach(shot => {
                     const shotEl = document.createElement('div');
                     shotEl.className = `shot-row ${shot.done ? 'is-done' : ''}`;
                     shotEl.dataset.id = shot.id;
 
                     shotEl.innerHTML = `
-                        <div class="shot-cell drag-handle" title="Drag to reorder (Coming soon)">⋮⋮</div>
-                        
+                        <div class="shot-cell drag-handle" title="Drag to reorder (Coming soon)" aria-hidden="true">⋮⋮</div>
+
                         <div class="shot-cell">
                             <span class="shot-number">${escapeHTML(shot.shotNumber)}</span>
                         </div>
-                        
+
                         <div class="shot-cell" style="flex-direction: column; align-items: stretch; position:relative;">
                             <div style="display:flex; justify-content:space-between; align-items:baseline;">
-                                <span class="shot-label-mobile">Type</span>
+                                <span class="shot-label-mobile">Framing / Type</span>
                                 <span class="shot-number-mobile">#${escapeHTML(shot.shotNumber)}</span>
                             </div>
                             <div class="input-group">
-                                <svg class="dropdown-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                                <input type="text" class="input-control shot-type-input has-left-icon" value="${escapeHTML(shot.type)}" placeholder="Shot Type..." 
+                                <svg class="dropdown-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <input type="text" class="input-control shot-type-input has-left-icon" value="${escapeHTML(shot.type)}" placeholder="e.g. CU, Wide..."
+                                    aria-label="Framing or shot size for shot ${escapeHTML(shot.shotNumber)}"
                                     oninput="handleAutocompleteInput(event, 'shotTypes', '${scene.id}', '${shot.id}', 'type')"
                                     onfocus="handleAutocompleteFocus(event, 'shotTypes', '${scene.id}', '${shot.id}', 'type')"
                                     onkeydown="handleAutocompleteKeydown(event)"
@@ -2051,11 +2249,21 @@
                                 <div class="autocomplete-dropdown"></div>
                             </div>
                         </div>
-                        
+
+                        <div class="shot-cell shot-movement-cell" style="align-items: flex-start; flex-direction: column;">
+                            <span class="shot-label-mobile">Shot Movement</span>
+                            <select class="input-control shot-movement-select" aria-label="Shot movement for shot ${escapeHTML(shot.shotNumber)}" onchange="updateShotField('${scene.id}', '${shot.id}', 'movement', this.value)">
+                                <option value="" ${normalizeShotMovement(shot.movement) === '' ? 'selected' : ''}>Not set</option>
+                                <option value="Still" ${normalizeShotMovement(shot.movement) === 'Still' ? 'selected' : ''}>Still</option>
+                                <option value="Moving" ${normalizeShotMovement(shot.movement) === 'Moving' ? 'selected' : ''}>Moving</option>
+                            </select>
+                        </div>
+
                         <div class="shot-cell" style="align-items: flex-start; flex-direction: column;">
-                            <span class="shot-label-mobile">Description</span>
+                            <span class="shot-label-mobile">Action / Description</span>
                             <div class="input-group" style="height: 100%;">
-                                <textarea class="input-control shot-desc-input" placeholder="Action / Camera Movement..." 
+                                <textarea class="input-control shot-desc-input" placeholder="Action / Camera Movement..."
+                                    aria-label="Action or description for shot ${escapeHTML(shot.shotNumber)}"
                                     oninput="handleAutocompleteInput(event, 'savedDescriptions', '${scene.id}', '${shot.id}', 'description'); autoResizeTextarea(this)"
                                     onfocus="handleAutocompleteFocus(event, 'savedDescriptions', '${scene.id}', '${shot.id}', 'description')"
                                     onkeydown="handleAutocompleteKeydown(event)"
@@ -2065,21 +2273,19 @@
                         </div>
 
                         <div class="shot-cell checkbox-container">
-                            <input type="checkbox" class="custom-checkbox" ${shot.done ? 'checked' : ''} onchange="toggleShotDone('${scene.id}', '${shot.id}', this.checked)">
+                            <input type="checkbox" class="custom-checkbox" ${shot.done ? 'checked' : ''} aria-label="Mark shot ${escapeHTML(shot.shotNumber)} complete" onchange="toggleShotDone('${scene.id}', '${shot.id}', this.checked)">
                         </div>
 
                         <div class="shot-cell shot-actions">
-                            <button class="btn-icon" onclick="moveShot('${scene.id}', '${shot.id}', -1)" title="Move Up">↑</button>
-                            <button class="btn-icon" onclick="moveShot('${scene.id}', '${shot.id}', 1)" title="Move Down">↓</button>
-                            <button class="btn-icon" onclick="duplicateShot('${scene.id}', '${shot.id}')" title="Duplicate">⎘</button>
-                            <button class="btn-icon" style="color: var(--danger-color);" onclick="deleteShot('${scene.id}', '${shot.id}')" title="Delete">✕</button>
+                            <button class="btn-icon" onclick="moveShot('${scene.id}', '${shot.id}', -1)" title="Move Up" aria-label="Move shot up">↑</button>
+                            <button class="btn-icon" onclick="moveShot('${scene.id}', '${shot.id}', 1)" title="Move Down" aria-label="Move shot down">↓</button>
+                            <button class="btn-icon" onclick="duplicateShot('${scene.id}', '${shot.id}')" title="Duplicate" aria-label="Duplicate shot">⎘</button>
+                            <button class="btn-icon" style="color: var(--danger-color);" onclick="deleteShot('${scene.id}', '${shot.id}')" title="Delete" aria-label="Delete shot">✕</button>
                         </div>
                     `;
                     shotsContainer.appendChild(shotEl);
-                    
-                    // Init textarea height
-                    const ta = shotEl.querySelector('textarea');
-                    if(ta) autoResizeTextarea(ta);
+                    const textarea = shotEl.querySelector('textarea');
+                    if (textarea) autoResizeTextarea(textarea);
                 });
             });
         }
@@ -2283,6 +2489,7 @@
         }
 
         function insertShotAfter(sceneId, shotId) {
+            clearFiltersForCreation();
             const scene = state.scenes.find(s => s.id === sceneId);
             if (scene) {
                 const idx = scene.shots.findIndex(s => s.id === shotId);
@@ -2338,9 +2545,13 @@
 
         function updateShotField(sceneId, shotId, field, value) {
             const scene = state.scenes.find(s => s.id === sceneId);
-            if(scene) {
+            if (scene) {
                 const shot = scene.shots.find(s => s.id === shotId);
-                if(shot) { shot[field] = value; markDirty(); }
+                if (shot) {
+                    shot[field] = field === 'movement' ? normalizeShotMovement(value) : value;
+                    markDirty();
+                    if (field === 'movement' && state.ui.movementFilters.length > 0) renderScenes();
+                }
             }
         }
 
@@ -2352,6 +2563,23 @@
         function handleSearch() {
             state.ui.searchQuery = document.getElementById('search-input').value;
             state.ui.filter = document.getElementById('filter-select').value;
+            state.ui.locationFilter = document.getElementById('location-filter').value;
+            state.ui.movementFilters = [];
+            if (document.getElementById('filter-still').checked) state.ui.movementFilters.push('Still');
+            if (document.getElementById('filter-moving').checked) state.ui.movementFilters.push('Moving');
+            renderScenes();
+        }
+
+        function clearFilters() {
+            state.ui.searchQuery = '';
+            state.ui.filter = 'All';
+            state.ui.locationFilter = '';
+            state.ui.movementFilters = [];
+            document.getElementById('search-input').value = '';
+            document.getElementById('filter-select').value = 'All';
+            document.getElementById('location-filter').value = '';
+            document.getElementById('filter-still').checked = false;
+            document.getElementById('filter-moving').checked = false;
             renderScenes();
         }
 
@@ -2466,7 +2694,7 @@
         function exportProjectJSON() {
             const exportData = {
                 format: "ShotListProject",
-                version: "2.0",
+                version: "2.1",
                 project: state.project,
                 scenes: state.scenes
             };
@@ -2494,7 +2722,7 @@
                         addNotification("Legacy Storyboard imported & converted", "success");
                     } else if (data.format === "ShotListProject") {
                         state.project = data.project || { title: "Imported Project", date: "" };
-                        state.scenes = data.scenes || [];
+                        state.scenes = normalizeShotListScenes(data.scenes || []);
                         state.google.fileId = null; // Break Drive link on import
                         
                         updateHeaderUI();
@@ -2539,6 +2767,7 @@
                                     id: generateId(),
                                     shotNumber: panel.shot || "",
                                     type: panel.checkbox || "",
+                                    movement: "",
                                     description: panel.text || "",
                                     done: false
                                 });
@@ -2574,54 +2803,83 @@
 
         // --- PDF EXPORT ---
         
-        function buildPDFForScenes(scenesArray, subtitle) {
+        function getActiveFilterSummary() {
+            const filters = [];
+            const movements = (state.ui.movementFilters || []).map(normalizeShotMovement).filter(Boolean);
+            if (movements.length > 0) filters.push(`Shot movement: ${movements.join(' + ')}`);
+            if (state.ui.locationFilter) filters.push(`Location: ${state.ui.locationFilter}`);
+            if (state.ui.filter === 'Done') filters.push('Status: Completed');
+            if (state.ui.filter === 'NotDone') filters.push('Status: Pending');
+            if (state.ui.searchQuery) filters.push(`Search: "${state.ui.searchQuery}"`);
+            return filters.length ? filters.join('  |  ') : 'All shots';
+        }
+
+        function getSceneExportLocation(scene) {
+            return String(scene.location || '').trim() || extractLocationFromTitle(scene.title) || 'UNCATEGORIZED';
+        }
+
+        function buildPDFForScenes(scenesArray, subtitle, filterSummary) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            
             const textColor = [20, 20, 20];
             const lineColor = [200, 200, 200];
-            
-            // Header
-            doc.setFont("helvetica", "bold");
+
+            // Project heading and export context
+            doc.setFont('helvetica', 'bold');
             doc.setFontSize(22);
-            doc.setTextColor(0,0,0);
-            doc.text((state.project.title || "Shot List").toUpperCase(), 14, 22);
-            
+            doc.setTextColor(0, 0, 0);
+            const titleLines = doc.splitTextToSize((state.project.title || 'Shot List').toUpperCase(), 182);
+            doc.text(titleLines, 14, 22);
+
+            let headerY = 22 + (titleLines.length - 1) * 8 + 6;
             doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(100,100,100);
-            
-            let headerY = 28;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
             doc.text(`Date: ${state.project.date || ''}`, 14, headerY);
-            
+            headerY += 5;
+
             if (subtitle) {
-                headerY += 5;
-                doc.setFont("helvetica", "bold");
-                doc.setFontSize(12);
-                doc.setTextColor(50,50,50);
-                doc.text(`Location: ${subtitle.toUpperCase()}`, 14, headerY);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.setTextColor(50, 50, 50);
+                const subtitleLines = doc.splitTextToSize(subtitle, 182);
+                doc.text(subtitleLines, 14, headerY);
+                headerY += subtitleLines.length * 5;
             }
-            
-            doc.setDrawColor(0,0,0);
+
+            if (filterSummary) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9);
+                doc.setTextColor(90, 90, 90);
+                const filterLines = doc.splitTextToSize(`Filters: ${filterSummary}`, 182);
+                doc.text(filterLines, 14, headerY);
+                headerY += filterLines.length * 4.5;
+            }
+
+            doc.setDrawColor(0, 0, 0);
             doc.setLineWidth(0.5);
-            doc.line(14, headerY + 4, 196, headerY + 4);
+            doc.line(14, headerY + 2, 196, headerY + 2);
 
             const tableData = [];
-            
             scenesArray.forEach(scene => {
                 let sceneStr = `SCENE ${scene.number}`;
-                if(scene.title) sceneStr += `: ${scene.title.toUpperCase()}`;
-                if(scene.location) sceneStr += ` - ${scene.location.toUpperCase()}`;
-                if(scene.time) sceneStr += ` - ${scene.time.toUpperCase()}`;
-                
+                if (scene.title) sceneStr += `: ${scene.title.toUpperCase()}`;
+                if (scene.location) sceneStr += ` - ${scene.location.toUpperCase()}`;
+                if (scene.time) sceneStr += ` - ${scene.time.toUpperCase()}`;
+                const movements = Array.from(new Set((scene.shots || []).map(shot =>
+                    normalizeShotMovement(shot.movement) || 'Not set'
+                )));
+                sceneStr += ` - SHOT MOVEMENT: ${movements.map(movement => movement.toUpperCase()).join(', ')}`;
+
                 tableData.push([
-                    { content: sceneStr, colSpan: 4, styles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 10 } }
+                    { content: sceneStr, colSpan: 5, styles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 9 } }
                 ]);
 
-                scene.shots.forEach(shot => {
+                (scene.shots || []).forEach(shot => {
                     tableData.push([
                         shot.shotNumber || '',
                         shot.type || '',
+                        normalizeShotMovement(shot.movement) || 'Not set',
                         shot.description || '',
                         shot.done ? '✓' : ''
                     ]);
@@ -2629,48 +2887,49 @@
             });
 
             doc.autoTable({
-                startY: headerY + 8,
-                head: [['Shot #', 'Type', 'Description', 'Done']],
+                startY: headerY + 6,
+                head: [['Shot #', 'Framing / Type', 'Movement', 'Action / Description', 'Done']],
                 body: tableData,
                 theme: 'grid',
-                headStyles: { fillColor: [40, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9 },
+                headStyles: { fillColor: [40, 40, 40], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
                 columnStyles: {
-                    0: { cellWidth: 20, fontStyle: 'bold' },
-                    1: { cellWidth: 35 },
-                    2: { cellWidth: 'auto' }, 
-                    3: { cellWidth: 20, halign: 'center', textColor: [39, 174, 96], fontStyle: 'bold' }
+                    0: { cellWidth: 18, fontStyle: 'bold' },
+                    1: { cellWidth: 28 },
+                    2: { cellWidth: 24 },
+                    3: { cellWidth: 'auto' },
+                    4: { cellWidth: 14, halign: 'center', textColor: [39, 174, 96], fontStyle: 'bold' }
                 },
-                styles: { fontSize: 9, cellPadding: 4, textColor: textColor, lineColor: lineColor, lineWidth: 0.1 },
+                styles: { fontSize: 8, cellPadding: 3, textColor, lineColor, lineWidth: 0.1, overflow: 'linebreak' },
                 didParseCell: function(data) {
-                    if (data.row.cells[0] && data.row.cells[0].colSpan === 4) {
+                    if (data.row.cells[0] && data.row.cells[0].colSpan === 5) {
                         data.cell.styles.fillColor = [235, 235, 235];
                         data.cell.styles.fontStyle = 'bold';
                     }
                 },
-                didDrawPage: function (data) {
+                didDrawPage: function(data) {
                     doc.setFontSize(8);
                     doc.setTextColor(150);
                     doc.text(`Page ${doc.internal.getNumberOfPages()}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
                 },
                 margin: { top: 35, right: 14, bottom: 20, left: 14 }
             });
-            
+
             return doc;
         }
-        
-        function groupScenesByLocation() {
-            const groups = {};
-            state.scenes.forEach(scene => {
-                const loc = extractLocationFromTitle(scene.title) || 'UNCATEGORIZED';
-                if (!groups[loc]) groups[loc] = [];
-                groups[loc].push(scene);
+
+        function groupScenesByLocation(scenesArray = state.scenes) {
+            const groups = new Map();
+            scenesArray.forEach(scene => {
+                const location = getSceneExportLocation(scene);
+                if (!groups.has(location)) groups.set(location, []);
+                groups.get(location).push(scene);
             });
             return groups;
         }
 
         function generatePDF() {
-            showLoader("Generating Professional PDF...");
-            
+            showLoader('Generating professional PDF...');
+
             setTimeout(() => {
                 try {
                     const sidebar = document.getElementById('pdf-location-sidebar');
@@ -2678,113 +2937,102 @@
                     const dlBtn = document.getElementById('btn-download-pdf');
                     const dlOneBtn = document.getElementById('btn-download-one-pdf');
                     const modalTitle = document.getElementById('pdf-modal-title');
-                    
+                    const filterSummary = getActiveFilterSummary();
+                    const exportScenes = getFilteredScenes();
+
+                    if (exportScenes.length === 0) {
+                        addNotification('No shots match the selected filters', 'info');
+                        return;
+                    }
+
                     if (state.ui.isSorted) {
-                        // SORTED MODE: generate separate PDFs per location
-                        const groups = groupScenesByLocation();
-                        const locationNames = Object.keys(groups);
-                        
-                        if (locationNames.length === 0) {
-                            addNotification("No scenes to export", "info");
-                            hideLoader();
-                            return;
-                        }
-                        
-                        // Build all per-location PDFs
-                        const pdfDocs = [];
-                        locationNames.forEach(loc => {
-                            const doc = buildPDFForScenes(groups[loc], loc);
-                            pdfDocs.push({ doc, location: loc, sceneCount: groups[loc].length });
+                        // Keep the location-sorted export, but scope every PDF to the active filters.
+                        const groups = groupScenesByLocation(exportScenes);
+                        const locationNames = Array.from(groups.keys());
+                        const pdfDocs = locationNames.map(location => {
+                            const scenes = groups.get(location);
+                            return {
+                                doc: buildPDFForScenes(scenes, `Location: ${location}`, filterSummary),
+                                location,
+                                sceneCount: scenes.length
+                            };
                         });
-                        
-                        // Build combined sorted PDF (all scenes in one PDF, sorted by location)
-                        const combinedDoc = buildPDFForScenes(state.scenes, "All Locations (Sorted)");
-                        
-                        // --- Populate location sidebar ---
+                        const combinedDoc = buildPDFForScenes(exportScenes, 'All Filtered Locations (Sorted)', filterSummary);
+
                         sidebar.style.display = 'block';
                         locList.innerHTML = '';
-                        
-                        // "All Locations" item at top
+
                         const allItem = document.createElement('div');
-                        allItem.className = 'pdf-loc-item';
-                        allItem.innerHTML = `<span>📄 All Locations</span><span class="loc-count">${state.scenes.length}</span>`;
+                        allItem.className = 'pdf-loc-item active';
+                        allItem.innerHTML = `<span>All filtered scenes</span><span class="loc-count">${exportScenes.length}</span>`;
                         allItem.onclick = () => {
                             document.querySelectorAll('.pdf-loc-item').forEach(el => el.classList.remove('active'));
                             allItem.classList.add('active');
                             document.getElementById('pdf-preview-iframe').src = combinedDoc.output('bloburl');
-                            modalTitle.textContent = 'PDF Preview — All Locations';
+                            modalTitle.textContent = 'PDF Preview — All filtered scenes';
                         };
                         locList.appendChild(allItem);
-                        
-                        // Individual location items
-                        pdfDocs.forEach((item, idx) => {
-                            const locItem = document.createElement('div');
-                            locItem.className = `pdf-loc-item ${idx === 0 ? 'active' : ''}`;
-                            locItem.innerHTML = `<span>${escapeHTML(item.location)}</span><span class="loc-count">${item.sceneCount}</span>`;
-                            locItem.onclick = () => {
+
+                        pdfDocs.forEach(item => {
+                            const locationItem = document.createElement('div');
+                            locationItem.className = 'pdf-loc-item';
+                            locationItem.innerHTML = `<span>${escapeHTML(item.location)}</span><span class="loc-count">${item.sceneCount}</span>`;
+                            locationItem.onclick = () => {
                                 document.querySelectorAll('.pdf-loc-item').forEach(el => el.classList.remove('active'));
-                                locItem.classList.add('active');
+                                locationItem.classList.add('active');
                                 document.getElementById('pdf-preview-iframe').src = item.doc.output('bloburl');
                                 modalTitle.textContent = `PDF Preview — ${item.location}`;
                             };
-                            locList.appendChild(locItem);
+                            locList.appendChild(locationItem);
                         });
-                        
-                        // Preview the first location
-                        document.getElementById('pdf-preview-iframe').src = pdfDocs[0].doc.output('bloburl');
-                        modalTitle.textContent = `PDF Preview — ${pdfDocs[0].location}`;
+
+                        document.getElementById('pdf-preview-iframe').src = combinedDoc.output('bloburl');
+                        modalTitle.textContent = 'PDF Preview — All filtered scenes';
                         document.getElementById('pdf-modal').classList.add('active');
-                        
-                        // Download All Separate PDFs button
-                        dlBtn.textContent = `Download All ${pdfDocs.length} PDFs`;
+
+                        dlBtn.textContent = `Download All ${pdfDocs.length} Location PDFs`;
                         dlBtn.onclick = () => {
-                            const projectSlug = state.project.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist';
-                            pdfDocs.forEach((item, i) => {
-                                const locSlug = item.location.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                                setTimeout(() => {
-                                    item.doc.save(`${projectSlug}_${locSlug}.pdf`);
-                                }, i * 500);
+                            const projectSlug = (state.project.title || 'shotlist').replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist';
+                            pdfDocs.forEach((item, index) => {
+                                const locationSlug = item.location.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'location';
+                                setTimeout(() => item.doc.save(`${projectSlug}_${locationSlug}.pdf`), index * 500);
                             });
-                            addNotification(`${pdfDocs.length} PDFs downloading — one per location`, "success");
+                            addNotification(`${pdfDocs.length} location PDFs downloading`, 'success');
                         };
-                        
-                        // Download as One PDF button
+
                         dlOneBtn.style.display = 'inline-flex';
                         dlOneBtn.onclick = () => {
-                            const filename = `${state.project.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist'}_sorted.pdf`;
-                            combinedDoc.save(filename);
-                            addNotification("Combined sorted PDF downloaded", "success");
+                            const projectSlug = (state.project.title || 'shotlist').replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist';
+                            combinedDoc.save(`${projectSlug}_filtered_sorted.pdf`);
+                            addNotification('Combined filtered PDF downloaded', 'success');
                         };
-                        
                     } else {
-                        // NORMAL MODE: single PDF with all scenes
                         sidebar.style.display = 'none';
                         locList.innerHTML = '';
                         dlOneBtn.style.display = 'none';
                         modalTitle.textContent = 'PDF Preview';
-                        
-                        const doc = buildPDFForScenes(state.scenes, null);
-                        
+
+                        const doc = buildPDFForScenes(exportScenes, null, filterSummary);
                         document.getElementById('pdf-preview-iframe').src = doc.output('bloburl');
                         document.getElementById('pdf-modal').classList.add('active');
-                        
+
                         dlBtn.textContent = 'Download PDF';
                         dlBtn.onclick = () => {
-                            const filename = `${state.project.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist'}.pdf`;
-                            doc.save(filename);
-                            addNotification("PDF Downloaded", "success");
+                            const projectSlug = (state.project.title || 'shotlist').replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'shotlist';
+                            const suffix = state.ui.movementFilters.length || state.ui.locationFilter || state.ui.filter !== 'All' || state.ui.searchQuery ? '_filtered' : '';
+                            doc.save(`${projectSlug}${suffix}.pdf`);
+                            addNotification('PDF downloaded', 'success');
                         };
                     }
-                    
-                } catch (e) {
-                    console.error(e);
-                    addNotification("Failed to generate PDF", "error");
+                } catch (error) {
+                    console.error(error);
+                    addNotification('Failed to generate PDF', 'error');
                 } finally {
                     hideLoader();
                 }
             }, 100);
         }
-        
+
         function closePDFPreview() {
             document.getElementById('pdf-modal').classList.remove('active');
             document.getElementById('pdf-location-sidebar').style.display = 'none';
@@ -3108,7 +3356,7 @@
                 
                 if(data.format === "ShotListProject") {
                     state.project = data.project || state.project;
-                    state.scenes = data.scenes || [];
+                    state.scenes = normalizeShotListScenes(data.scenes || []);
                     state.google.fileId = fileId; // Link to drive
                     
                     updateHeaderUI();
@@ -3162,7 +3410,7 @@
             
             try {
                 const exportData = {
-                    format: "ShotListProject", version: "2.0",
+                    format: "ShotListProject", version: "2.1",
                     project: state.project, scenes: state.scenes
                 };
                 
